@@ -2,9 +2,22 @@ Yes. The strongest way to use the ideas you've been developing is to treat a **c
 
 The central design principle is:
 
-$$
-\boxed{\text{Agent} = \text{state} + \text{typed transformations} + \text{IR} + \text{semantic invariants} + \text{effectful execution}}
-$$
+[
+\boxed{
+\text{Agent}
+============
+
+\text{state}
++
+\text{typed transformations}
++
+\text{IR}
++
+\text{semantic invariants}
++
+\text{effectful execution}
+}
+]
 
 Your curry/product ideas become useful because they tell you how to **factor the agent's state and computations without changing their semantics**.
 
@@ -14,26 +27,29 @@ Your curry/product ideas become useful because they tell you how to **factor the
 
 Let:
 
-* $C$ = conversation/context
-* $M$ = persistent memory
-* $W$ = workspace/codebase state
-* $T$ = available tools
-* $G$ = current goal
-* $E$ = environment
+* (C) = conversation/context
+* (M) = persistent memory
+* (W) = workspace/codebase state
+* (T) = available tools
+* (G) = current goal
+* (E) = environment
 
 Then the naïve agent is something like:
 
-$$
-Agent: C \times M \times W \times G \times E \to Action \times M' \times W'.
-$$
+[
+Agent:
+C\times M\times W\times G\times E
+\to
+Action\times M'\times W'.
+]
 
 That's mathematically fine, but terrible as an implementation interface.
 
 You have a giant product:
 
-$$
-C \times M \times W \times G \times E.
-$$
+[
+C\times M\times W\times G\times E.
+]
 
 The first architectural move is to **factor it**.
 
@@ -43,15 +59,21 @@ The first architectural move is to **factor it**.
 
 Instead of thinking:
 
-$$
-Agent: C \times M \times W \times G \times E \to Result,
-$$
+[
+Agent:
+C\times M\times W\times G\times E
+\to Result,
+]
 
 you can represent it as:
 
-$$
-C \to (M \to (W \to (G \to (E \to Result)))).
-$$
+[
+C\to
+(M\to
+(W\to
+(G\to
+(E\to Result)))).
+]
 
 This doesn't magically make the agent better. It gives you a **compositional representation**.
 
@@ -59,9 +81,9 @@ You can partially specialize it.
 
 For example:
 
-$$
-Agent(c, m, w, -, -)
-$$
+[
+Agent(c,m,w,-,-)
+]
 
 is now a computation specialized to a particular conversation, memory, and workspace.
 
@@ -112,9 +134,9 @@ Now the LLM isn't directly mutating reality.
 
 It produces:
 
-$$
+[
 IR
-$$
+]
 
 and another subsystem interprets it.
 
@@ -152,21 +174,33 @@ flowchart LR
 
 This gives you a very important separation:
 
-$$
-\boxed{\text{LLM proposes computation}}
-$$
+[
+\boxed{
+\text{LLM proposes computation}
+}
+]
 
 versus
 
-$$
-\boxed{\text{runtime determines whether computation is valid}}
-$$
+[
+\boxed{
+\text{runtime determines whether computation is valid}
+}
+]
 
 That's exactly analogous to:
 
-$$
-\text{source program} \to \text{IR} \to \text{type checking} \to \text{optimization} \to \text{execution}.
-$$
+[
+\text{source program}
+\to
+\text{IR}
+\to
+\text{type checking}
+\to
+\text{optimization}
+\to
+\text{execution}.
+]
 
 ---
 
@@ -186,29 +220,33 @@ Don't represent that merely as a list of strings.
 
 Represent it as a typed computation:
 
-$$
-Op_1; Op_2; Op_3; Op_4; Op_5.
-$$
+[
+Op_1;Op_2;Op_3;Op_4;Op_5.
+]
 
 More formally, you can view the IR as a small language whose terms have types.
 
 For example:
 
-$$
-ReadFile: Path \to File
-$$
+[
+ReadFile:
+Path\to File
+]
 
-$$
-Search: (Query, Workspace) \to SearchResult
-$$
+[
+Search:
+(Query,Workspace)\to SearchResult
+]
 
-$$
-Modify: (File, Patch) \to Workspace'
-$$
+[
+Modify:
+(File,Patch)\to Workspace'
+]
 
-$$
-RunTests: Workspace \to TestResult.
-$$
+[
+RunTests:
+Workspace\to TestResult.
+]
 
 Now the planner has to produce something that type-checks.
 
@@ -218,51 +256,58 @@ Now the planner has to produce something that type-checks.
 
 Suppose:
 
-$$
-ReadFile: p \to File
-$$
+[
+ReadFile:p\to File
+]
 
 and:
 
-$$
-Search: q \to SearchResult.
-$$
+[
+Search:q\to SearchResult.
+]
 
 If they don't depend on each other's outputs, you have:
 
-$$
-p \times q
-$$
+[
+p\times q
+]
 
 as independent inputs.
 
 You can represent:
 
-$$
-ReadFile(p) \times Search(q).
-$$
+[
+ReadFile(p)\times Search(q).
+]
 
 Instead of forcing:
 
-$$
-ReadFile(p); Search(q)
-$$
+[
+ReadFile(p);
+Search(q)
+]
 
 sequentially.
 
 The optimizer can discover:
 
-$$
-\boxed{Dependency(ReadFile, Search) = \varnothing}
-$$
+[
+\boxed{
+Dependency(ReadFile,Search)=\varnothing
+}
+]
 
 and execute them concurrently.
 
 So the algebraic idea becomes:
 
-$$
-\text{product decomposition} \Rightarrow \text{dependency analysis} \Rightarrow \text{parallel execution}.
-$$
+[
+\text{product decomposition}
+\Rightarrow
+\text{dependency analysis}
+\Rightarrow
+\text{parallel execution}.
+]
 
 That's a very real compiler architecture principle.
 
@@ -272,50 +317,56 @@ That's a very real compiler architecture principle.
 
 Suppose the agent wants:
 
-$$
-ReadFile \prec Analyze \prec Patch \prec Test.
-$$
+[
+ReadFile
+\prec
+Analyze
+\prec
+Patch
+\prec
+Test.
+]
 
 This isn't necessarily a total sequence.
 
 You might have:
 
-$$
+[
 ReadFile(A)
-$$
+]
 
 and:
 
-$$
+[
 ReadFile(B)
-$$
+]
 
 independent of each other.
 
 Then:
 
-$$
-ReadFile(A) \parallel ReadFile(B)
-$$
+[
+ReadFile(A)\parallel ReadFile(B)
+]
 
 followed by:
 
-$$
-Analyze(A, B).
-$$
+[
+Analyze(A,B).
+]
 
 So the plan naturally becomes a DAG.
 
 Mathematically:
 
-$$
-Plan = (V, \preceq)
-$$
+[
+Plan=(V,\preceq)
+]
 
 where:
 
-* $V$ = operations,
-* $\preceq$ = dependency/order relation.
+* (V) = operations,
+* (\preceq) = dependency/order relation.
 
 Then the executor chooses a linear extension of the partial order.
 
@@ -327,39 +378,59 @@ This is one of the strongest ways to turn your order-theoretic thinking into an 
 
 I would strongly avoid:
 
-$$
+[
 Memory = \text{everything we've ever seen}.
-$$
+]
 
 Instead factor it:
 
-$$
-M = M_{episodic} \times M_{semantic} \times M_{procedural} \times M_{workspace}.
-$$
+[
+M=
+M_{episodic}
+\times
+M_{semantic}
+\times
+M_{procedural}
+\times
+M_{workspace}.
+]
 
 For example:
 
-$$
-M_{episodic} = \text{past interactions}
-$$
+[
+M_{episodic}
+============
 
-$$
-M_{semantic} = \text{facts about the project}
-$$
+\text{past interactions}
+]
 
-$$
-M_{procedural} = \text{known workflows/preferences}
-$$
+[
+M_{semantic}
+============
 
-$$
-M_{workspace} = \text{current code state}.
-$$
+\text{facts about the project}
+]
+
+[
+M_{procedural}
+==============
+
+\text{known workflows/preferences}
+]
+
+[
+M_{workspace}
+=============
+
+\text{current code state}.
+]
 
 Then retrieval becomes typed:
 
-$$
-Retrieve: Query \times M_i \to Evidence.
-$$
+[
+Retrieve:
+Query\times M_i\to Evidence.
+]
 
 Instead of asking:
 
@@ -367,15 +438,15 @@ Instead of asking:
 
 you ask:
 
-$$
+[
 Retrieve_{semantic}(q)
-$$
+]
 
 or:
 
-$$
+[
 Retrieve_{procedural}(q).
-$$
+]
 
 That gives your memory system a **type discipline**.
 
@@ -399,9 +470,17 @@ enum Op {
 
 Now a plan might be:
 
-$$
-RetrieveProcedural(q) \rightarrow ReadCode(p) \rightarrow GeneratePatch(...) \rightarrow ApplyPatch(...) \rightarrow RunTests(...).
-$$
+[
+RetrieveProcedural(q)
+\rightarrow
+ReadCode(p)
+\rightarrow
+GeneratePatch(...)
+\rightarrow
+ApplyPatch(...)
+\rightarrow
+RunTests(...).
+]
 
 The important thing is that memory retrieval becomes a **first-class computation**, rather than invisible prompt decoration.
 
@@ -411,21 +490,27 @@ The important thing is that memory retrieval becomes a **first-class computation
 
 Suppose a tool needs:
 
-$$
-Tool: Credentials \times Environment \times Input \to Output.
-$$
+[
+Tool:
+Credentials\times Environment\times Input
+\to
+Output.
+]
 
 Instead of passing all three everywhere, curry it:
 
-$$
-Credentials \to (Environment \to (Input \to Output)).
-$$
+[
+Credentials
+\to
+(Environment\to
+(Input\to Output)).
+]
 
 Then instantiate:
 
-$$
-tool_{env,cred}: Input \to Output.
-$$
+[
+tool_{env,cred}:Input\to Output.
+]
 
 This is essentially what you were getting at with:
 
@@ -439,15 +524,16 @@ Each wrapper is **partial application / composition of an environment with a com
 
 So your agent runtime could construct:
 
-$$
-Executor: Environment \to (IR \to Result).
-$$
+[
+Executor:
+Environment\to(IR\to Result).
+]
 
 Then instantiate:
 
-$$
-executor_{env}: IR \to Result.
-$$
+[
+executor_{env}:IR\to Result.
+]
 
 That is a very clean architecture.
 
@@ -457,15 +543,16 @@ That is a very clean architecture.
 
 Functional:
 
-$$
-execute: Environment \times IR \to Result.
-$$
+[
+execute:
+Environment\times IR\to Result.
+]
 
 Curried:
 
-$$
-Environment \to (IR \to Result).
-$$
+[
+Environment\to(IR\to Result).
+]
 
 Object-oriented:
 
@@ -485,17 +572,17 @@ These are semantically very close.
 
 The OOP object:
 
-$$
-Executor = (Environment, execute)
-$$
+[
+Executor=(Environment,execute)
+]
 
 packages the environment and behavior.
 
 The functional version keeps them explicit:
 
-$$
-Environment \times IR \to Result.
-$$
+[
+Environment\times IR\to Result.
+]
 
 This is exactly the representation-level equivalence you were exploring earlier.
 
@@ -517,23 +604,31 @@ modify_everything()
 
 prefer:
 
-$$
-Read \to Analyze \to Transform \to Validate \to Write.
-$$
+[
+Read
+\to
+Analyze
+\to
+Transform
+\to
+Validate
+\to
+Write.
+]
 
 ### Pure transformations
 
 Prefer:
 
-$$
-Code \to Code'
-$$
+[
+Code\to Code'
+]
 
 over:
 
-$$
-Code \to World
-$$
+[
+Code\to World
+]
 
 when possible.
 
@@ -541,15 +636,15 @@ when possible.
 
 Mark:
 
-$$
+[
 ReadFile
-$$
+]
 
 as an effect, while:
 
-$$
+[
 ParseAST
-$$
+]
 
 is pure.
 
@@ -557,15 +652,15 @@ is pure.
 
 Give an operation:
 
-$$
+[
 WriteFile(Path)
-$$
+]
 
 rather than unrestricted:
 
-$$
+[
 Shell().
-$$
+]
 
 Now "coding style" becomes partially machine-checkable.
 
@@ -577,23 +672,35 @@ You can type tools by their authority.
 
 For example:
 
-$$
-ReadFile: Path \xrightarrow{Read} File.
-$$
+[
+ReadFile:
+Path
+\xrightarrow{Read}
+File.
+]
 
-$$
-WriteFile: Path \times Content \xrightarrow{Write} Workspace.
-$$
+[
+WriteFile:
+Path\times Content
+\xrightarrow{Write}
+Workspace.
+]
 
-$$
-RunShell: Command \xrightarrow{Exec} Environment.
-$$
+[
+RunShell:
+Command
+\xrightarrow{Exec}
+Environment.
+]
 
 Then your IR can carry effect information:
 
-$$
-Op: Input \xrightarrow{Effect} Output.
-$$
+[
+Op:
+Input
+\xrightarrow{Effect}
+Output.
+]
 
 So the planner can't merely ask:
 
@@ -601,9 +708,11 @@ So the planner can't merely ask:
 
 The runtime asks:
 
-$$
-\boxed{\text{Does this plan possess the required capability?}}
-$$
+[
+\boxed{
+\text{Does this plan possess the required capability?}
+}
+]
 
 That's directly connected to your earlier security work.
 
@@ -613,39 +722,49 @@ That's directly connected to your earlier security work.
 
 At a fairly abstract level, think:
 
-$$
-\boxed{\mathcal{C} = \text{category of typed agent computations}.}
-$$
+[
+\boxed{
+\mathcal C
+==========
+
+\text{category of typed agent computations}.
+}
+]
 
 Objects:
 
-$$
-Context,\ Memory,\ File,\ AST,\ Patch,\ TestResult, \ldots
-$$
+[
+Context,\ Memory,\ File,\ AST,\ Patch,\ TestResult,\ldots
+]
 
 Morphisms:
 
-$$
-ReadFile,\ Parse,\ Analyze,\ Transform,\ Write,\ Test, \ldots
-$$
+[
+ReadFile,
+Parse,
+Analyze,
+Transform,
+Write,
+Test,\ldots
+]
 
 Composition:
 
-$$
-g \circ f.
-$$
+[
+g\circ f.
+]
 
 Products:
 
-$$
-A \times B.
-$$
+[
+A\times B.
+]
 
 Function spaces:
 
-$$
+[
 B^A.
-$$
+]
 
 Effects/capabilities annotate morphisms.
 
@@ -653,15 +772,25 @@ Then the agent is not fundamentally "an LLM."
 
 The LLM is a **planner/approximate morphism synthesizer**:
 
-$$
-\boxed{LLM: (Context, Goal, AvailableOps) \to IR.}
-$$
+[
+\boxed{
+LLM:
+(Context,Goal,AvailableOps)
+\to
+IR.
+}
+]
 
 The trusted runtime is the interpreter:
 
-$$
-\boxed{Interpret: IR \times State \to State \times Result.}
-$$
+[
+\boxed{
+Interpret:
+IR\times State
+\to
+State\times Result.
+}
+]
 
 ---
 
@@ -669,29 +798,43 @@ $$
 
 You can make the whole thing a state transition system:
 
-$$
-\boxed{Step: State \times IR \to State \times Observation.}
-$$
+[
+\boxed{
+Step:
+State\times IR
+\to
+State\times Observation.
+}
+]
 
 where:
 
-$$
-State = (Context, Memory, Workspace, Capabilities).
-$$
+[
+State=
+(Context,Memory,Workspace,Capabilities).
+]
 
 Then an agent trajectory is:
 
-$$
-s_0 \xrightarrow{op_1} s_1 \xrightarrow{op_2} s_2 \xrightarrow{op_3} \cdots \xrightarrow{op_n} s_n.
-$$
+[
+s_0
+\xrightarrow{op_1}
+s_1
+\xrightarrow{op_2}
+s_2
+\xrightarrow{op_3}
+\cdots
+\xrightarrow{op_n}
+s_n.
+]
 
 This is where your previous **monoid/state-machine** thinking becomes relevant.
 
 Composition of operations gives:
 
-$$
-op_2 \circ op_1.
-$$
+[
+op_2\circ op_1.
+]
 
 Repeated execution gives a monoidal structure on plans.
 
@@ -701,13 +844,15 @@ Repeated execution gives a monoidal structure on plans.
 
 Once the IR exists, you can apply compiler transformations.
 
+For example:
+
 ### Dead-operation elimination
 
 If:
 
-$$
+[
 ReadFile(A)
-$$
+]
 
 produces a value never used, remove it.
 
@@ -715,71 +860,75 @@ produces a value never used, remove it.
 
 If:
 
-$$
+[
 Search(q)
-$$
+]
 
 occurs twice with unchanged state:
 
-$$
-Search(q); Search(q)
-$$
+[
+Search(q);Search(q)
+]
 
 potentially replace with:
 
-$$
+[
 Search(q).
-$$
+]
 
 ### Parallelization
 
 If:
 
-$$
-op_1 \perp op_2
-$$
+[
+op_1\perp op_2
+]
 
 in dependency space:
 
-$$
-op_1 \parallel op_2.
-$$
+[
+op_1\parallel op_2.
+]
 
 ### Partial evaluation
 
 If:
 
-$$
-Config = c
-$$
+[
+Config=c
+]
 
 is known:
 
-$$
-f(Config, x) \leadsto f_c(x).
-$$
+[
+f(Config,x)
+\leadsto
+f_c(x).
+]
 
 ### Memoization
 
 If:
 
-$$
-f(x) = y
-$$
+[
+f(x)=y
+]
 
 is pure:
 
-$$
-Cache(x) = y.
-$$
+[
+Cache(x)=y.
+]
 
 ### Plan normalization
 
 Use associativity:
 
-$$
-(op_1 \circ op_2) \circ op_3 \cong op_1 \circ (op_2 \circ op_3)
-$$
+[
+(op_1\circ op_2)\circ op_3
+\cong
+op_1\circ(op_2\circ op_3)
+]
 
 to canonicalize plans.
 
@@ -789,41 +938,49 @@ to canonicalize plans.
 
 If you actually wanted to build this, I'd separate:
 
-$$
-\boxed{Goal\ IR \rightarrow Plan\ IR \rightarrow Execution\ IR \rightarrow Observation\ IR}
-$$
+[
+\boxed{
+Goal\ IR
+\rightarrow
+Plan\ IR
+\rightarrow
+Execution\ IR
+\rightarrow
+Observation\ IR
+}
+]
 
 ### Goal IR
 
 What does the user want?
 
-$$
-Goal = (Intent, Constraints, AcceptanceCriteria).
-$$
+[
+Goal=(Intent,Constraints,AcceptanceCriteria).
+]
 
 ### Plan IR
 
 What computation should happen?
 
-$$
-Plan = (Ops, Dependencies).
-$$
+[
+Plan=(Ops,Dependencies).
+]
 
 ### Execution IR
 
 What concrete tools/capabilities are invoked?
 
-$$
-Exec = (ToolCall, Arguments, Capabilities).
-$$
+[
+Exec=(ToolCall,Arguments,Capabilities).
+]
 
 ### Observation IR
 
 What happened?
 
-$$
-Observation = (Result, Diff, Error, TestResult).
-$$
+[
+Observation=(Result,Diff,Error,TestResult).
+]
 
 Then memory stores **observations and derived semantic facts**, rather than raw conversational sludge.
 
@@ -865,9 +1022,21 @@ flowchart TB
 
 The important feedback loop is:
 
-$$
-\boxed{Goal \to Plan \to Execute \to Observe \to Update\ Memory \to Replan.}
-$$
+[
+\boxed{
+Goal
+\to
+Plan
+\to
+Execute
+\to
+Observe
+\to
+Update\ Memory
+\to
+Replan.
+}
+]
 
 ---
 
@@ -875,26 +1044,46 @@ $$
 
 Your previous mathematics maps surprisingly cleanly:
 
-$$
+[
 \boxed{
 \begin{array}{lll}
-A \times B & \leftrightarrow & \text{explicitly composed state/input} \\
-A \to B & \leftrightarrow & \text{typed computation} \\
-A \times B \to C & \cong & A \to (B \to C) \\
-\text{product decomposition} & \leftrightarrow & \text{dependency decomposition} \\
-\text{isomorphism} & \leftrightarrow & \text{semantics-preserving IR transformation} \\
-\text{order} & \leftrightarrow & \text{execution dependencies} \\
-\text{monoid} & \leftrightarrow & \text{composable plans} \\
-\text{capability} & \leftrightarrow & \text{authorized effect} \\
-\text{exponential} & \leftrightarrow & \text{partially applied/configured computation}
+A\times B
+&\leftrightarrow&
+\text{explicitly composed state/input}[2mm]
+A\to B
+&\leftrightarrow&
+\text{typed computation}[2mm]
+A\times B\to C
+&\cong&
+A\to(B\to C)[2mm]
+\text{product decomposition}
+&\leftrightarrow&
+\text{dependency decomposition}[2mm]
+\text{isomorphism}
+&\leftrightarrow&
+\text{semantics-preserving IR transformation}[2mm]
+\text{order}
+&\leftrightarrow&
+\text{execution dependencies}[2mm]
+\text{monoid}
+&\leftrightarrow&
+\text{composable plans}[2mm]
+\text{capability}
+&\leftrightarrow&
+\text{authorized effect}[2mm]
+\text{exponential}
+&\leftrightarrow&
+\text{partially applied/configured computation}.
 \end{array}
 }
-$$
+]
 
 The design philosophy I'd extract is:
 
-$$
-\boxed{\textbf{Don't make the LLM the runtime. Make the LLM synthesize a typed program.}}
-$$
+[
+\boxed{
+\textbf{Don't make the LLM the runtime. Make the LLM synthesize a typed program.}
+}
+]
 
 Then your **IR is the boundary between probabilistic generation and deterministic computation**. The type system, dependency order, capability system, optimizer, executor, and memory system operate on that IR. That gives you exactly the place where the algebraic/category-theoretic ideas you've been studying become engineering mechanisms rather than just analogies.

@@ -1,22 +1,9 @@
-pub trait SessionId {
-    fn new() -> Self;
-    fn as_str(&self) -> &str;
+
+fn main() -> Result<()> {
+    let app = ApplicationBuilder::new()
+        .load_config()?
+        .load_plugins()?
+        .build()?;
+
+    app.run()
 }
-
-pub trait SessionMeta {
-    fn new() ->self;
-    fn as_str(&self) -> &str;
-}
-
-impl SessionId for String {
-    fn new() -> Self {
-        uuid::Uuid::new_v4().to_string()
-    }
-
-    fn as_str(&self) -> &str {
-        self
-    }
-}
-
-
-
