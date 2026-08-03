@@ -39,6 +39,7 @@ impl GoogleIdentityProvider {
         )
         .set_redirect_uri(RedirectUrl::new(redirect_url).expect("Invalid redirect URL"));
         Self { client }
+        // create the google client:
     }
 
     pub fn generate_authorize_url(&self, pkce_challenge: &PkceCodeChallenge) -> (Url, CsrfToken) {
@@ -49,8 +50,34 @@ impl GoogleIdentityProvider {
             .add_scope(Scope::new("profile".to_string()))
             .set_pkce_challenge(pkce_challenge.clone())
             .url()
+
     }
 }
+
+
+// pub enum LoginState {
+
+//     Anonymous,
+
+//     AwaitingAuthorization {
+//         state: CsrfToken,
+//         pkce_verifier: PkceCodeVerifier,
+//         created_at: SystemTime,
+//     },
+
+//     AwaitingCallback {
+//         state: CsrfToken,
+//         pkce_verifier: PkceCodeVerifier,
+//     },
+
+//     Authenticated {
+//         session_id: SessionId,
+//     },
+
+//     Expired,
+
+//     Revoked,
+// }
 
 #[async_trait]
 impl IdentityProvider for GoogleIdentityProvider {
@@ -58,9 +85,17 @@ impl IdentityProvider for GoogleIdentityProvider {
         &self,
         callback: &OAuthCallback,
     ) -> Result<AuthenticatedSession, AuthError> {
+        // Anonymous -> Login() ->
+        // 1. Create Auth Request
+        // 2. Browser Redirect
+        // 3. Callback
+        // 4. Receive AuthorizationCode
+        // 5. Exchange Token
+
         let code = AuthorizationCode::new(callback.code.clone());
         let pkce_verifier = callback.pkce_verifier.clone();
 
+        // 
         let token_response = self
             .client
             .exchange_code(code)
@@ -69,39 +104,39 @@ impl IdentityProvider for GoogleIdentityProvider {
             .await
             .map_err(|_| AuthError {})?;
 
-        // You would fetch the user info with the returned token here in a real application
+        // // You would fetch the user info with the returned token here in a real application
 
-        Ok(AuthenticatedSession {
-            // ... populate session with tokens, user_id, etc.
-            // Placeholder stub:
-            access_token: token_response.access_token().secret().to_string(),
-            refresh_token: token_response
-                .refresh_token()
-                .map(|rt| rt.secret().to_string()),
-            // other fields as required
-        })
+        // Ok(AuthenticatedSession {
+        //     // ... populate session with tokens, user_id, etc.
+        //     // Placeholder stub:
+        //     access_token: token_response.access_token().secret().to_string(),
+        //     refresh_token: token_response
+        //         .refresh_token()
+        //         .map(|rt| rt.secret().to_string()),
+        //     // other fields as required
+        // })
     }
 
     async fn refresh(
         &self,
         token: oauth2::RefreshToken,
     ) -> Result<AuthenticatedSession, AuthError> {
-        let token_response = self
-            .client
-            .exchange_refresh_token(&token)
-            .request_async(async_http_client)
-            .await
-            .map_err(|_| AuthError {})?;
+        // let token_response = self
+        //     .client
+        //     .exchange_refresh_token(&token)
+        //     .request_async(async_http_client)
+        //     .await
+        //     .map_err(|_| AuthError {})?;
 
-        // With the new tokens, update session info as needed.
+        // // With the new tokens, update session info as needed.
 
-        Ok(AuthenticatedSession {
-            access_token: token_response.access_token().secret().to_string(),
-            refresh_token: token_response
-                .refresh_token()
-                .map(|rt| rt.secret().to_string()),
-            // other fields as required
-        })
+        // Ok(AuthenticatedSession {
+        //     access_token: token_response.access_token().secret().to_string(),
+        //     refresh_token: token_response
+        //         .refresh_token()
+        //         .map(|rt| rt.secret().to_string()),
+        //     // other fields as required
+        // })
     }
 }
 
