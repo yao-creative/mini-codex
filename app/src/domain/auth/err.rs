@@ -1,0 +1,5 @@
+
+
+struct AuthorizationError;
+
+struct ExchangeCodeError;

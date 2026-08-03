@@ -1,18 +1,19 @@
 
+use crate::domain::auth::{AuthorizationRequest, AuthorizationCode, AccessToken};
 
-// is a state machine 
-pub struct Authenticator{
-    //stateless
+
+// trait for Authenticator:
+trait IdentityProvider{
+    async fn authorize(&self, authorization_request: &AuthorizationRequest) -> Result<AuthorizationCode, AuthorizationError> ;
+    async fn exchange_code(&self, authorization_code: &AuthorizationCode) -> Result<AccessToken, ExchangeCodeError>;
+    async fn refresh(&self, );
 }
 
-pub trait AuthenticatorTrait{
-    fn step(&self, ) -> Result<UserIdentity, AuthError>{
+pub struct Auth0Provider;
 
-    }
+impl IdentityProvider for Auth0Provider {
+    async fn authorize(...);
+    async fn exchange_code(...);
+    async fn refresh(...);
 }
 
-pub impl Authenticator for AuthenticatorTrait{
-    async fn step(&self, ) -> Result<UserIdentity, AuthError>{
-        
-    }
-}
