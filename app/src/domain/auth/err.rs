@@ -1,5 +1,8 @@
 
 
-struct AuthorizationError;
+pub struct AuthorizationError;
 
-struct ExchangeCodeError;
+pub struct ExchangeCodeError;
+
+pub struct RefreshError;
+pub struct RevokeError;
