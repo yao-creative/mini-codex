@@ -1,18 +1,19 @@
-
-
+pub struct UserId(pub String);
 // is a state machine 
 pub struct Authenticator{
     //stateless
 }
 
 pub trait AuthenticatorTrait{
-    fn step(&self, ) -> Result<UserIdentity, AuthError>{
+    fn authenticate(&self) -> Result<UserId, AuthError> {
 
     }
 }
-
-pub impl Authenticator for AuthenticatorTrait{
-    async fn step(&self, ) -> Result<UserIdentity, AuthError>{
-        
+impl AuthenticatorTrait for Authenticator {
+    fn authenticate(&self) -> Result<UserId, AuthError> {
+        // Basic demonstration implementation
+        // In a real system, replace with proper authentication logic
+        Ok(UserId("demo_user".to_string()))
     }
 }
+
