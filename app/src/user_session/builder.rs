@@ -1,21 +1,21 @@
-use crate::domain::session::{UserId, UserSessionId, UserSession};
+use crate::domain::session::{UserId, SessionId, UserSessionState};
 
 use std::time::SystemTime;
 
-pub struct UserSessionBuilder {
+pub struct UserSessionStateBuilder {
 }
 
 
-pub trait UserSessionBuilderTrait {
-    fn build(&self, user_id: &UserId) -> Result<UserSession, UserSessionBuildError>;
+pub trait UserSessionStateBuilderTrait {
+    fn build(&self, user_id: &UserId) -> Result<UserSessionState, UserSessionStateBuildError>;
 }
 
-impl UserSessionBuilderTrait for UserSessionBuilder {
-    fn build(self, user_id: &UserId) -> UserSession {
+impl UserSessionStateBuilderTrait for UserSessionStateBuilder {
+    fn build(self, user_id: &UserId) -> UserSessionState {
         let user_id = UserId(user_id);
-        let user_session_id = UserSessionId(uuid::Uuid::new_v4().to_string());
+        let session_id = SessionId(uuid::Uuid::new_v4().to_string());
         let created_at = SystemTime::now();
-        UserSession {
+        UserSessionState {
             user_id,
             user_session_id,
             created_at,

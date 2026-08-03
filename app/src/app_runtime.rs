@@ -1,6 +1,6 @@
 use crate::authenticator::Authenticator;
 use crate::domain::states::app_runtime::{AppRuntimeResult, AppRuntimeError};
-use crate::user_session_runtime::{UserSessionRuntime, UserSessionBuilder};
+use crate::user_session_runtime::{UserSessionRuntime, UserSessionStateBuilder};
 
 
 
@@ -8,7 +8,7 @@ use crate::user_session_runtime::{UserSessionRuntime, UserSessionBuilder};
 
 pub struct AppRuntime {
     scheduler: Scheduler,
-    UserSessionRuntime:UserSessionRuntime,
+    storage: Storage, 
     telemetry: Telemetry,
     authenticator: Authenticator,
 }
@@ -28,7 +28,7 @@ impl AppRuntimeTrait for AppRuntime {
         // Continue with rest of startup 
         // build user session
         // load user state
-        let user_session = UserSessionBuilder.build(user_id);
+        let user_session_state = UserSessionStateBuilder.build(user_id);
         
         
 

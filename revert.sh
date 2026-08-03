@@ -1,28 +1,50 @@
 #!/usr/bin/env bash
 set -e
 
-BASE="77b398d0e3582d11074be803c5b979aabda2e67d"
+# Model tag to use (granite3.1-dense:8b supports tool execution natively in Ollama)
+MODEL_TAG="granite3.1-dense:8b"
 
-echo "Creating backup branch..."
-git branch backup-before-secret-removal
-
-echo "Squashing commits since main..."
-GIT_SEQUENCE_EDITOR="sed -i '' -e '2,$ s/^pick /squash /'" \
-git rebase -i "$BASE"
-
-echo "Removing .env from history snapshot..."
-git rm --cached -f .env 2>/dev/null || true
-
-echo "Amending commit..."
-git commit --amend --no-edit
-
-echo "Checking if .env is still tracked..."
-if git ls-files | grep -q "\.env"; then
-    echo "ERROR: .env is still tracked"
+echo "=== 1. Checking Ollama Daemon ==="
+if ! command -v ollama &> /dev/null; then
+    echo "Error: Ollama is not installed."
     exit 1
 fi
 
-echo "Force pushing rewritten history..."
-git push origin develop --force-with-lease
+if ! curl -s http://localhost:11434/api/version > /dev/null; then
+    echo "Ollama server is not running. Starting Ollama..."
+    ollama serve &
+    sleep 3
+fi
 
-echo "Done."
+echo "=== 2. Pulling IBM Granite Model: $MODEL_TAG ==="
+ollama pull "$MODEL_TAG"
+
+echo "=== 3. Writing Global OpenCode Configuration ==="
+CONFIG_DIR="$HOME/.config/opencode"
+mkdir -p "$CONFIG_DIR"
+
+cat << EOF > "$CONFIG_DIR/opencode.json"
+{
+  "\$schema": "https://opencode.ai/config.json",
+  "model": "ollama/$MODEL_TAG",
+  "provider": {
+    "ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama",
+      "options": {
+        "baseURL": "http://localhost:11434/v1"
+      },
+      "models": {
+        "$MODEL_TAG": {
+          "name": "IBM Granite 3.1 Dense 8B",
+          "contextWindow": 131072
+        }
+      }
+    }
+  }
+}
+EOF
+
+echo "=== Setup Complete! ==="
+echo "Global configuration written to: $CONFIG_DIR/opencode.json"
+echo "You can now launch 'opencode' from any directory."
