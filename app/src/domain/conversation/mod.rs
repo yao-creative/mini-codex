@@ -4,3 +4,4 @@ pub struct Conversation{
     attachments: Vec<Attachment>,
     memories: Vec<MemoryReference>,
 }
+
