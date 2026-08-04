@@ -1,8 +1,8 @@
-   0.003068500s  INFO prepare_target{force=false package_id=app v0.1.0 (/Users/yao/projects/mini-codex/app) target="app"}: cargo::core::compiler::fingerprint: fingerprint dirty for app v0.1.0 (/Users/yao/projects/mini-codex/app)/Check { test: false }/TargetInner { name: "app", doc: true, ..: with_path("/Users/yao/projects/mini-codex/app/src/main.rs", Edition2024) }
-   0.003086334s  INFO prepare_target{force=false package_id=app v0.1.0 (/Users/yao/projects/mini-codex/app) target="app"}: cargo::core::compiler::fingerprint:     dirty: NothingObvious
-   0.003365084s  INFO prepare_target{force=false package_id=app v0.1.0 (/Users/yao/projects/mini-codex/app) target="app"}: cargo::core::compiler::fingerprint: fingerprint dirty for app v0.1.0 (/Users/yao/projects/mini-codex/app)/Check { test: true }/TargetInner { name: "app", doc: true, ..: with_path("/Users/yao/projects/mini-codex/app/src/main.rs", Edition2024) }
-   0.003371334s  INFO prepare_target{force=false package_id=app v0.1.0 (/Users/yao/projects/mini-codex/app) target="app"}: cargo::core::compiler::fingerprint:     dirty: NothingObvious
+   0.003081375s  INFO prepare_target{force=false package_id=app v0.1.0 (/Users/yao/projects/mini-codex/app) target="app"}: cargo::core::compiler::fingerprint: fingerprint dirty for app v0.1.0 (/Users/yao/projects/mini-codex/app)/Check { test: false }/TargetInner { name: "app", doc: true, ..: with_path("/Users/yao/projects/mini-codex/app/src/main.rs", Edition2024) }
+   0.003097416s  INFO prepare_target{force=false package_id=app v0.1.0 (/Users/yao/projects/mini-codex/app) target="app"}: cargo::core::compiler::fingerprint:     dirty: NothingObvious
+   0.003359041s  INFO prepare_target{force=false package_id=app v0.1.0 (/Users/yao/projects/mini-codex/app) target="app"}: cargo::core::compiler::fingerprint: fingerprint dirty for app v0.1.0 (/Users/yao/projects/mini-codex/app)/Check { test: true }/TargetInner { name: "app", doc: true, ..: with_path("/Users/yao/projects/mini-codex/app/src/main.rs", Edition2024) }
+   0.003363958s  INFO prepare_target{force=false package_id=app v0.1.0 (/Users/yao/projects/mini-codex/app) target="app"}: cargo::core::compiler::fingerprint:     dirty: NothingObvious
     Checking app v0.1.0 (/Users/yao/projects/mini-codex/app)
-error: could not compile `app` (bin "app" test) due to 2 previous errors
-warning: build failed, waiting for other jobs to finish...
 error: could not compile `app` (bin "app") due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `app` (bin "app" test) due to 2 previous errors

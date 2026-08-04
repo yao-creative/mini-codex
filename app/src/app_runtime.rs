@@ -1,6 +1,6 @@
 use crate::authenticator::Authenticator;
 use crate::domain::states::app_runtime::{AppRuntimeResult, AppRuntimeError};
-use crate::user_session_runtime::{UserSessionRuntime, UserSessionStateBuilder};
+use crate::builders::user_session::builder::UserSessionStateBuilder
 
 
 
