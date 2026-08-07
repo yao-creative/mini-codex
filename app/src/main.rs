@@ -1,9 +1,8 @@
+use crate::bootstrap::Bootstrap;
+
 
 fn main() -> Result<()> {
-    let app = ApplicationBuilder::new()
-        .load_config()?
-        .load_plugins()?
-        .build()?;
-
-    app.run()
+    Bootstrap::new(std::env::args())
+        .build()?
+        .run()
 }
